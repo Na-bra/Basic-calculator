@@ -1,98 +1,36 @@
+// src/logic/Calculations.java
 package logic;
-
-
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Calculations {
+    private double solution = 0;
 
-    static double solution = 0;
-    static ArrayList<String> strEquations = new ArrayList<String>();
-
-public static void main(String[] args) {
-
-    Calculations calc = new Calculations("30+20+300");
-        System.out.println(solution);
+    public static void main(String[] args) {
+        Calculations calc = new Calculations("3010*200");
+        System.out.println(calc.getSolution());
     }
 
-    public Calculations (String equation){
-        this.chooseOperator(equation);
-
+    public Calculations(String equation) {
+        this.solution = solvePM(equation);
     }
 
-    // Calculation functions
-
-    public void add(String equation){
-        equation.strip();
-       String[] operations = equation.split("\\+");
-       for (String operand : operations){
-           solution += convertString(operand);
-       }
+    public double getSolution() {
+        return solution;
     }
 
-    public void sub(String equation){
-        equation.strip();
-        String[] operations = equation.split("-");
-        for (String operand : operations){
-            solution -= convertString(operand);
-        }
-    }
+    private double solvePM(String equation) {
+        double result = 0;
+        Pattern pattern = Pattern.compile("([+-]?\\d+(?:\\.\\d+)?)");
+        Matcher matcher = pattern.matcher(equation.replaceAll("\\s+", ""));
 
-    public void storeEquations(String op){
 
-    }
-
-    public void chooseOperator(String equation) {
-        int operatorCount = 0;
-        StringBuilder sb = new StringBuilder();
-        String formattedString = "";
-        if (equation == null) {
-            System.out.println("Error null");
-        }
-        for (int i = 0; i < Objects.requireNonNull(equation).length(); i++) {
-            formattedString = String.valueOf(sb.append(equation.charAt(i)));
-            if (equation.charAt(i) == '+') {
-                operatorCount++;
-                if (operatorCount == 2) {
-                    add(formattedString);
-                    operatorCount = 0;
-                    formattedString ="";
-                }
+            while (matcher.find()) {
+                result += Double.parseDouble(matcher.group());
             }
-            if (equation.charAt(i) == '-') {
-                operatorCount++;
-                if (operatorCount == 2) {
-                    sub(formattedString);
-                    operatorCount = 0;
-                    formattedString = "";
-                }
-            }
-        }
-    }
+        return result;
 
 
+    } // <-- Add this closing brace
 
-    // Return double so it can calculate any input
-    public Double convertString(String numberString) {
-        Double numberInt = null;
-        try {
-            numberInt = Double.parseDouble(numberString);
-        } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid number format");
-            return null;
-        }
-        return numberInt;
-    }
-
-    public void invalidOperation(String equation) throws InvalidOpratorsException {
-     if (!equation.contains("+") && !equation.contains("-") && !equation.contains("/")
-            && !equation.contains("x")){
-            throw new InvalidOpratorsException();
-     }
-
-    }
-
-    public Integer toInteger(Integer value){
-        return null;
-    }
-}
+} // <-- And this one for the class
