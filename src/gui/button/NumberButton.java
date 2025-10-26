@@ -1,6 +1,5 @@
-package button;
+package gui.button;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class NumberButton extends Button{

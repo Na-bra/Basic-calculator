@@ -1,4 +1,4 @@
-package button;
+package gui.button;
 import javax.swing.JButton;
 import java.awt.Color;
 
@@ -13,5 +13,7 @@ public class ButtonEs extends JButton{
         this.setBackground(Color.DARK_GRAY);
         this.setDoubleBuffered(true);
     }
+
+
 
 }

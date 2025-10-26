@@ -1,4 +1,4 @@
-package button;
+package gui.button;
 import gui.Panel;
 
 import javax.swing.*;
@@ -6,8 +6,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import gui.text.TextManger;
 
-public class ButtonManger{
+public class ButtonManger implements ActionListener {
     Panel panel;
     HashMap<Integer, JButton> hm = new HashMap<>(24,0.75f);
     CommandButton cb;
@@ -29,6 +30,7 @@ public class ButtonManger{
         setIndex();
         setButtonFonts();
         loadTapPad();
+        activateButtons();
     }
 
     public void loadTapPad(){
@@ -76,6 +78,39 @@ public class ButtonManger{
             hm.get(i).setFont(buttonFont);
         }
     }
-}
+
+    public void activateButtons(){
+        for (int i = 0; i < hm.size(); i++ ){
+            hm.get(i).addActionListener(this);
+        }
+        hm.get(0).removeActionListener(this);
+        hm.get(2).removeActionListener(this);
+        hm.get(14).removeActionListener(this);
+        hm.get(14).addActionListener((_) -> {
+            String str = TextManger.getText();
+            StringBuilder str2 = new StringBuilder();
+
+            for(int i = 0; i < str.length() - 1; ++i) {
+                str2.append(str.charAt(i));
+            }
+
+            TextManger.setText(str2.toString());
+        });
+    }
+
+
+    public void actionPerformed(ActionEvent e) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Object var5 = e.getSource();
+        if (var5 instanceof JButton clickedButton) {
+            String incText = clickedButton.getText();
+            String newText = String.valueOf(stringBuilder.append(TextManger.getText()).append(incText));
+            TextManger.setText(newText);
+            System.out.println(newText);
+        }
+
+    }
+   }
+
 
 
