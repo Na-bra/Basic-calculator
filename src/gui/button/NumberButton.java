@@ -2,7 +2,7 @@ package gui.button;
 
 import java.awt.*;
 
-public class NumberButton extends Button{
+public final class NumberButton extends Button{
 
     NumberButton() {
         super();
@@ -28,6 +28,7 @@ public class NumberButton extends Button{
     @Override
     public void design(ButtonEs btn){
         btn.setForeground(Color.white);
+        btn.setBackground(Color.BLACK);
 
     }
 

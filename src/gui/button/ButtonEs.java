@@ -10,7 +10,7 @@ public class ButtonEs extends JButton{
         this.setFocusPainted(false);
 
         this.setBorder(null);
-        this.setBackground(Color.DARK_GRAY);
+        this.setBackground(Color.black);
         this.setDoubleBuffered(true);
     }
 

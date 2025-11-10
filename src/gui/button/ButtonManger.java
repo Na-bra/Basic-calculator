@@ -1,29 +1,32 @@
 package gui.button;
+
 import gui.Panel;
+import gui.text.TextManger;
+import logic.Calculations;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import gui.text.TextManger;
 
-public class ButtonManger implements ActionListener {
-    Panel panel;
-    HashMap<Integer, JButton> hm = new HashMap<>(24,0.75f);
-    CommandButton cb;
-    NumberButton nb;
-    OperationButton ob;
-    int size;
-    int x;
-    int y;
+/**
+ * ButtonManger wires the calculator keypad. It keeps the visual order mapping
+ * from the original project but fixes several bugs:
+ * - replaces non-existent getFirst() calls
+ * - makes backspace safe for empty text
+ * - wires '=' to evaluate (normalizing 'x' -> '*')
+ * - wires 'C' to clear
+ */
+public final class ButtonManger implements ActionListener {
+    private final Panel panel;
+    private final HashMap<Integer, JButton> hm = new HashMap<>(24, 0.75f);
+    private final CommandButton cb;
+    private final NumberButton nb;
+    private final OperationButton ob;
 
-
-    public ButtonManger(Panel panel){
+    public ButtonManger(Panel panel) {
         this.panel = panel;
-        size = panel.boxSize;
-        x = 0;
-        y = panel.maxWidth/2;
         cb = new CommandButton();
         nb = new NumberButton();
         ob = new OperationButton();
@@ -33,84 +36,110 @@ public class ButtonManger implements ActionListener {
         activateButtons();
     }
 
-    public void loadTapPad(){
-        int width = panel.maxWidth;
-        int height = (panel.maxHeight)/2;
+    private void loadTapPad() {
+        // keep a lightweight GridLayout pad and place it in the bottom half
         JPanel tapPad = new JPanel();
-        tapPad.setLayout(new GridLayout(6,3));
+        tapPad.setLayout(new GridLayout(6, 3));
         panel.add(tapPad);
 
-        tapPad.setBounds(width - panel.maxWidth,panel.maxHeight - height - 100,width,height + 100);
+        tapPad.setBounds(0, panel.maxHeight / 2, panel.maxWidth, panel.maxHeight / 2);
 
-        for (int i = 0; i < hm.size(); i++){
+        for (int i = 0; i < hm.size(); i++) {
             tapPad.add(hm.get(i));
         }
     }
 
-    public void setIndex(){
-        hm.put(0,cb.buttons.get(2));
-        hm.put(1, ob.buttons.get(3));
-        hm.put(2,cb.buttons.getFirst());
-        hm.put(3,nb.buttons.get(7));
-        hm.put(4,nb.buttons.get(8));
-        hm.put(5,nb.buttons.get(9));
-        hm.put(6,nb.buttons.get(6));
-        hm.put(7,nb.buttons.get(5));
-        hm.put(8,nb.buttons.get(4));
-        hm.put(9,nb.buttons.get(3));
-        hm.put(10,nb.buttons.get(2));
-        hm.put(11,nb.buttons.get(1));
-        hm.put(12,ob.buttons.get(4));
-        hm.put(13,nb.buttons.get(0));
-        hm.put(14,cb.buttons.get(1));
-        hm.put(15,ob.buttons.getFirst());
-        hm.put(16,ob.buttons.get(1));
-        hm.put(17,ob.buttons.get(2));
-
+    private void setIndex() {
+        // Visual mapping (preserves original layout intent). Index comments show button meaning.
+        hm.put(0, cb.buttons.get(2));   // C
+        hm.put(1, ob.buttons.get(3));   // /
+        hm.put(2, cb.buttons.get(0));   // =
+        hm.put(3, nb.buttons.get(7));
+        hm.put(4, nb.buttons.get(8));
+        hm.put(5, nb.buttons.get(9));
+        hm.put(6, nb.buttons.get(6));
+        hm.put(7, nb.buttons.get(5));
+        hm.put(8, nb.buttons.get(4));
+        hm.put(9, nb.buttons.get(3));
+        hm.put(10, nb.buttons.get(2));
+        hm.put(11, nb.buttons.get(1));
+        hm.put(12, ob.buttons.get(4));  // .
+        hm.put(13, nb.buttons.get(0));
+        hm.put(14, cb.buttons.get(1));  // <- backspace
+        hm.put(15, ob.buttons.get(0));  // +
+        hm.put(16, ob.buttons.get(1));  // -
+        hm.put(17, ob.buttons.get(2));  // x
     }
 
-
-
-
-    public void setButtonFonts(){
-        Font buttonFont = new Font(Font.SANS_SERIF, Font.BOLD,18);
-        for (int i = 0; i < hm.size(); i++){
+    private void setButtonFonts() {
+        Font buttonFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+        for (int i = 0; i < hm.size(); i++) {
             hm.get(i).setFont(buttonFont);
         }
     }
 
-    public void activateButtons(){
-        for (int i = 0; i < hm.size(); i++ ){
-            hm.get(i).addActionListener(this);
-        }
-        hm.get(0).removeActionListener(this);
-        hm.get(2).removeActionListener(this);
-        hm.get(14).removeActionListener(this);
-        hm.get(14).addActionListener((_) -> {
-            String str = TextManger.getText();
-            StringBuilder str2 = new StringBuilder();
-
-            for(int i = 0; i < str.length() - 1; ++i) {
-                str2.append(str.charAt(i));
+    private void activateButtons() {
+        // Add the generic appending listener to non-command buttons
+        for (int i = 0; i < hm.size(); i++) {
+            JButton b = hm.get(i);
+            String text = b.getText();
+            if ("=".equals(text) || "C".equals(text) || "<-".equals(text)) {
+                // command buttons handled below
+                continue;
             }
+            b.addActionListener(this);
+        }
 
-            TextManger.setText(str2.toString());
+        // Clear button (C)
+        JButton clearBtn = cb.buttons.get(2);
+        clearBtn.addActionListener((ev) -> TextManger.clear());
+
+        // Backspace button (<-)
+        JButton backBtn = cb.buttons.get(1);
+        backBtn.addActionListener((ev) -> {
+            String str = TextManger.getText();
+            if (str == null || str.isEmpty()) return;
+            TextManger.setText(str.substring(0, Math.max(0, str.length() - 1)));
+        });
+
+        // Equals button (=) — evaluate safely, normalize 'x' -> '*'
+        JButton equalsBtn = cb.buttons.get(0);
+        equalsBtn.addActionListener((ev) -> {
+            String expr = TextManger.getText();
+            if (expr == null) return;
+            expr = expr.replace('x', '*').replaceAll("\\s+", "");
+
+            // remove trailing operators/dots
+            while (!expr.isEmpty() && "+-*/.".indexOf(expr.charAt(expr.length() - 1)) != -1) {
+                expr = expr.substring(0, expr.length() - 1);
+            }
+            if (expr.isEmpty()) return;
+
+            try {
+                Calculations calc = new Calculations(expr);
+                TextManger.setText(calc.getStrSolution());
+            } catch (Exception ex) {
+                TextManger.setText("NaN");
+                System.out.println("Evaluation error: " + ex.getMessage());
+            }
         });
     }
 
-
+    @Override
     public void actionPerformed(ActionEvent e) {
-        StringBuilder stringBuilder = new StringBuilder();
-        Object var5 = e.getSource();
-        if (var5 instanceof JButton clickedButton) {
+        Object src = e.getSource();
+        if (src instanceof JButton) {
+            JButton clickedButton = (JButton) src;
             String incText = clickedButton.getText();
-            String newText = String.valueOf(stringBuilder.append(TextManger.getText()).append(incText));
+            String previous = TextManger.getText();
+            if (previous == null) previous = "";
+            String newText = previous + incText;
             TextManger.setText(newText);
+            // lightweight logging for debug
             System.out.println(newText);
         }
-
     }
-   }
+}
 
 
 

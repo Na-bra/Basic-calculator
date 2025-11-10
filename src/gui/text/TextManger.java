@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TextManger {
-    private final static String BASIC = "0";
+    private final static String BASIC = "";
     private static Text tx = new Text(BASIC);
     private static String displayedText;
     Panel panel;
@@ -33,6 +33,10 @@ public class TextManger {
 
     public static String getText() {
         return tx.getText();
+    }
+
+    public static void clear(){
+        tx.setText("");
     }
 
 

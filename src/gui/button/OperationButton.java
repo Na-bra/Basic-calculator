@@ -3,7 +3,7 @@ package gui.button;
 
 import java.awt.*;
 
-public class OperationButton extends Button {
+public final class OperationButton extends Button {
 
     OperationButton() {
         super();
@@ -11,6 +11,7 @@ public class OperationButton extends Button {
         loadDesign();
     }
 
+    @Override
     public void getButtons(){
         buttons.add(new ButtonEs("+"));
         buttons.add(new ButtonEs("-"));
