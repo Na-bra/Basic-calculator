@@ -9,8 +9,12 @@ public class ButtonEs extends JButton{
         this.setFocusable(false);
         this.setFocusPainted(false);
 
+        // Lightweight, flat button styling. Keep background default black-ish
         this.setBorder(null);
-        this.setBackground(Color.black);
+        this.setBorderPainted(false);
+        this.setOpaque(true);
+        this.setBackground(Color.BLACK);
+        this.setForeground(Color.WHITE);
         this.setDoubleBuffered(true);
     }
 

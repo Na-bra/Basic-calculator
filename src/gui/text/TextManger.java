@@ -20,9 +20,13 @@ public class TextManger {
         int width = panel.maxWidth - padding * 2;
         int height = panel.maxHeight / 4;
         tx.setBounds(padding, padding, width, height - padding);
+        // Display styling: keep text white on black with an orange border accent
+        tx.setOpaque(true);
+        tx.setBackground(Color.BLACK);
         tx.setForeground(Color.WHITE);
         tx.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 36));
         tx.setHorizontalAlignment(SwingConstants.RIGHT);
+        tx.setBorder(BorderFactory.createLineBorder(new Color(0xFF8C00), 2));
         panel.add(tx);
     }
 

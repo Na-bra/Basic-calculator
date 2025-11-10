@@ -18,6 +18,8 @@ public final class CommandButton extends Button {
     }
     @Override
     public void design(ButtonEs btn){
-        btn.setForeground(Color.RED);
+        // Command buttons use white background with dark text for clarity
+        btn.setBackground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
     }
 }

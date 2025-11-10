@@ -24,7 +24,10 @@ public final class OperationButton extends Button {
 
     @Override
     public void design(ButtonEs btn){
-        btn.setForeground(Color.GREEN.brighter());
+        // Operation buttons are highlighted in orange with dark text for contrast
+        Color accent = new Color(0xFF8C00); // orange
+        btn.setBackground(accent);
+        btn.setForeground(Color.BLACK);
     }
 
 }
